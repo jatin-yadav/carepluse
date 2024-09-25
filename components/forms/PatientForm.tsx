@@ -12,6 +12,8 @@ import emailIcon from "@/public/assets/icons/email.svg"
 import SubmitButton from "../SubmitButton"
 import { useState } from "react"
 import { UserFormValidation } from "@/lib/validation"
+import { createUser } from "@/lib/actions/patient.actions"
+import { useRouter } from "next/navigation";
 
 
 export enum FormFieldType {
@@ -27,6 +29,7 @@ export enum FormFieldType {
 
 
 const PatientForm = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
@@ -37,12 +40,13 @@ const PatientForm = () => {
     },
   })
 
-  async function onSubmit({ name, email, phone }: z.infer<typeof UserFormValidation>) {
-    setIsLoading(true);
-
+  const onSubmit = async ({ name, email, phone }: z.infer<typeof UserFormValidation>) => {
     try {
+      setIsLoading(true);
       const userData = { name, email, phone }
-      console.log(userData)
+      const user = await createUser(userData);
+
+      if (user) router.push(`/patients/${user.$id}/register`)
 
     } catch (error) {
       console.log(error)
