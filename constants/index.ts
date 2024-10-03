@@ -7,7 +7,7 @@ import drremirez from "@/public/assets/images/dr-remirez.png";
 import drlee from "@/public/assets/images/dr-lee.png";
 import drcruz from "@/public/assets/images/dr-cruz.png";
 import drsharma from "@/public/assets/images/dr-sharma.png";
-export const GenderOptions = ["Male", "Female", "Other"];
+export const GenderOptions = ["male", "female", "other"];
 
 export const PatientFormDefaultValues = {
   firstName: "",
@@ -15,7 +15,7 @@ export const PatientFormDefaultValues = {
   email: "",
   phone: "",
   birthDate: new Date(Date.now()),
-  gender: "Male" as Gender,
+  gender: "male" as Gender,
   address: "",
   occupation: "",
   emergencyContactName: "",

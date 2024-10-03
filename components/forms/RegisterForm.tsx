@@ -12,11 +12,11 @@ import userIcon from "@/public/assets/icons/user.svg"
 import emailIcon from "@/public/assets/icons/email.svg"
 import SubmitButton from "../SubmitButton"
 import { useState } from "react"
-import { UserFormValidation } from "@/lib/validation"
-import { createUser } from "@/lib/actions/patient.actions"
+import { PatientFormValidation } from "@/lib/validation"
+import { registerPatient } from "@/lib/actions/patient.actions"
 import { useRouter } from "next/navigation";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
-import { Doctors, GenderOptions, IdentificationTypes } from "@/constants"
+import { Doctors, GenderOptions, IdentificationTypes, PatientFormDefaultValues } from "@/constants"
 import { Label } from "../ui/label"
 import { SelectItem } from "../ui/select"
 import Image from "next/image"
@@ -36,27 +36,43 @@ export enum FormFieldType {
 
 
 const RegisterForm = ({ user }: { user: User }) => {
-    console.log(user);
-
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false)
-    const form = useForm<z.infer<typeof UserFormValidation>>({
-        resolver: zodResolver(UserFormValidation),
+    const form = useForm<z.infer<typeof PatientFormValidation>>({
+        resolver: zodResolver(PatientFormValidation),
         defaultValues: {
-            name: "",
-            email: "",
-            phone: ""
+            ...PatientFormDefaultValues
         },
     })
 
-    const onSubmit = async ({ name, email, phone }: z.infer<typeof UserFormValidation>) => {
+    const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
+        setIsLoading(true);
+        let formData;
+
+        if (values.identificationDocument && values.identificationDocument.length > 0) {
+            const blobFile = new Blob([values.identificationDocument[0]], {
+                type: values.identificationDocument[0].type
+            })
+
+            formData = new FormData()
+            formData.append('blobFile', blobFile)
+            formData.append('fileName', values.identificationDocument[0].name)
+        }
         try {
-            setIsLoading(true);
-            const userData = { name, email, phone }
-            const user = await createUser(userData);
+            const patientData = {
+                ...values,
+                userid: user.$id,
+                birthDate: new Date(values.birthDate),
+                identificationDocument: formData,
+            }
 
-            if (user) router.push(`/patients/${user.$id}/register`)
+            console.log("values:", patientData);
 
+            //@ts-expect-error testing right now
+            const patient = await registerPatient(patientData)
+
+            if (patient) router.push(`/patients/${user.$id}/new-appointment`)
+            // setIsLoading(false);
         } catch (error) {
             console.log(error)
 
@@ -296,7 +312,7 @@ const RegisterForm = ({ user }: { user: User }) => {
                 <CustomFormField
                     fieldType={FormFieldType.CHECKBOX}
                     control={form.control}
-                    name="diclosureConsent"
+                    name="disclosureConsent"
                     label="I consent to disclosure of information"
                 />
                 <CustomFormField
@@ -314,3 +330,9 @@ const RegisterForm = ({ user }: { user: User }) => {
 }
 
 export default RegisterForm
+
+
+
+
+
+

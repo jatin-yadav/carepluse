@@ -3,6 +3,7 @@ import fullLogo from '@/public/assets/icons/logo-full.svg';
 import registerImg from '@/public/assets/images/register-img.png';
 import RegisterForm from "@/components/forms/RegisterForm";
 import { getUser } from "@/lib/actions/patient.actions";
+// import RegisterForm1 from "@/components/forms/RegisterForm-1";
 
 
 const Register = async ({ params: { userId } }: SearchParamProps) => {
@@ -19,6 +20,7 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
                         className="mb-12 h-10 w-fit"
                     />
                     <RegisterForm user={user} />
+                    {/* <RegisterForm1 user={user} /> */}
                     <p className="copyright py-12">
                         ©️ 2024 CarePulse
                     </p>
